@@ -1,0 +1,5 @@
+---
+kubectx_version: 0.9.4
+kubectx_for_all_users: true
+
+command_shell: bash
