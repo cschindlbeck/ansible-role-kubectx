@@ -1,16 +1,16 @@
 ---
 - name: Install required software
-  package:
+  ansible.builtin.package:
     name: unzip
     state: present
 
 - name: Set download directory if install only for the user
-  set_fact:
+  ansible.builtin.set_fact:
     kubectx_runtime_dir: "{{ ansible_user_dir }}/bin"
   when: not kubectx_for_all_users | bool
 
 - name: Set download directory for all users to use
-  set_fact:
+  ansible.builtin.set_fact:
     kubectx_runtime_dir: "/usr/local/bin"
   when: kubectx_for_all_users | bool
 
@@ -22,14 +22,14 @@
   when: not kubectx_for_all_users | bool
 
 - name: Download and unzip file
-  unarchive:
+  ansible.builtin.unarchive:
     src: "https://github.com/ahmetb/kubectx/releases/download/v{{ kubectx_version }}/kubectx_v{{ kubectx_version }}_linux_x86_64.tar.gz"
     dest: "/tmp"
     remote_src: yes
   changed_when: False
 
 - name: Copy file to runtime directory
-  copy:
+  ansible.builtin.copy:
     src: "/tmp/kubectx"
     dest: "{{ kubectx_runtime_dir }}"
     mode: 0755
