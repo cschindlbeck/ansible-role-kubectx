@@ -16,19 +16,27 @@
         kubectx_runtime_dir: "/usr/local/bin"
       when: kubectx_for_all_users | bool
 
-    - name: Find the kubectx file
+    - name: Loop through binaries
+      ansible.builtin.set_fact:
+        binaries: ["kubectx", "kubens"]
+
+    - name: Find the binary files
       ansible.builtin.stat:
-        path: "{{ kubectx_runtime_dir }}/kubectx"
-      register: kubectx_file
+        path: "{{ kubectx_runtime_dir }}/{{ item }}"
+      register: binary_files
+      loop: "{{ binaries }}"
 
     - name: Print stat info
       ansible.builtin.debug:
-        msg: "{{ kubectx_file.stat }}"
+        msg: "{{ item.item }}: {{ item.stat }}"
+      loop: "{{ binary_files.results }}"
 
-    - name: Assert that kubectx exists
+    - name: Assert that binaries exist
       ansible.builtin.assert:
-        that: kubectx_file.stat.exists
+        that: item.stat.exists
+      loop: "{{ binary_files.results }}"
 
-    - name: Assert that kubectx is executable
+    - name: Assert that binaries are executable
       ansible.builtin.assert:
-        that: kubectx_file.stat.executable
+        that: item.stat.executable
+      loop: "{{ binary_files.results }}"

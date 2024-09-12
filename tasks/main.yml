@@ -18,19 +18,25 @@
   ansible.builtin.file:
     path: "{{ ansible_user_dir }}/bin"
     state: directory
-    mode: 0755
+    mode: "0755"
   when: not kubectx_for_all_users | bool
 
-- name: Download and unzip file
+- name: Download and unzip files
   ansible.builtin.unarchive:
-    src: "https://github.com/ahmetb/kubectx/releases/download/v{{ kubectx_version }}/kubectx_v{{ kubectx_version }}_linux_x86_64.tar.gz"
+    src: "https://github.com/ahmetb/kubectx/releases/download/v{{ kubectx_version }}/{{ item }}_v{{ kubectx_version }}_linux_x86_64.tar.gz"
     dest: "/tmp"
-    remote_src: yes
-  changed_when: False
+    remote_src: true
+  changed_when: false
+  loop:
+    - kubectx
+    - kubens
 
-- name: Copy file to runtime directory
+- name: Copy files to runtime directory
   ansible.builtin.copy:
-    src: "/tmp/kubectx"
+    src: "/tmp/{{ item }}"
     dest: "{{ kubectx_runtime_dir }}"
-    mode: 0755
-    remote_src: yes
+    mode: "0755"
+    remote_src: true
+  loop:
+    - kubectx
+    - kubens
